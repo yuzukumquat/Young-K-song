@@ -53,7 +53,7 @@ h2 { font-size: 20px; margin: 10px 0 5px; }
 
 .sub-btn-group {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   margin-top: 5px;
 }
 .sub-btn {
@@ -61,8 +61,8 @@ h2 { font-size: 20px; margin: 10px 0 5px; }
   background-color: #eef1f5;
   border: 1px solid #c0c5cd;
   border-radius: 8px;
-  padding: 12px;
-  font-size: 14px;
+  padding: 12px 8px;
+  font-size: 13px;
   font-weight: 600;
   color: #222;
   cursor: pointer;
@@ -100,9 +100,8 @@ h2 { font-size: 20px; margin: 10px 0 5px; }
   <div class="sub-btn-group">
     <button class="sub-btn" onclick="selectSong(2)">둘 다 좋다</button>
     <button class="sub-btn" onclick="selectSong(2)">모르겠다</button>
+    <button class="sub-btn" onclick="undoSelect()" style="background-color:#fff3cd; border-color:#ffebaa;">↩️ 이전으로</button>
   </div>
-  
-  <button class="sub-btn" onclick="resetProgress()" style="width:100%; margin-top:10px; background-color:#ffdcdc; border-color:#f5b8b8;">처음부터 다시하기</button>
 </div>
 
 <div id="resultContainer">
@@ -116,7 +115,6 @@ h2 { font-size: 20px; margin: 10px 0 5px; }
     </thead>
     <tbody id="resultBody"></tbody>
   </table>
-  <button class="sub-btn" onclick="resetProgress()" style="width:100%; margin-top:15px;">다시하기</button>
 </div>
 
 <script>
@@ -174,8 +172,8 @@ pairs.sort(function() { return 0.5 - Math.random(); });
 var currentIdx = 0;
 var totalPairs = pairs.length;
 
-// 저장된 데이터 불러오기
-loadProgress();
+// 이전 기록을 저장할 배열
+var historyList = [];
 
 function renderPair() {
   if (currentIdx >= totalPairs) {
@@ -192,6 +190,12 @@ function renderPair() {
 }
 
 function selectSong(choice) {
+  // 선택 전 현재 상태 저장 (이전으로 돌아가기 위해)
+  historyList.push({
+    scores: Object.assign({}, scores),
+    currentIdx: currentIdx
+  });
+
   var pair = pairs[currentIdx];
   if (choice === 0) {
     scores[pair[0]] += 1;
@@ -203,9 +207,19 @@ function selectSong(choice) {
   }
 
   currentIdx++;
-  
-  // 상태 자동 저장
-  saveProgress();
+  renderPair();
+}
+
+// 이전 선택 취소(뒤로 가기)
+function undoSelect() {
+  if (historyList.length === 0) {
+    alert("처음 단계입니다.");
+    return;
+  }
+
+  var lastState = historyList.pop();
+  scores = lastState.scores;
+  currentIdx = lastState.currentIdx;
 
   renderPair();
 }
@@ -226,34 +240,6 @@ function renderResult() {
     var tr = document.createElement("tr");
     tr.innerHTML = "<td>" + (i + 1) + "</td><td>" + sortedSongs[i] + "</td>";
     tbody.appendChild(tr);
-  }
-}
-
-// 중간 저장 및 로드 관련 함수
-function saveProgress() {
-  localStorage.setItem("yk_sort_scores", JSON.stringify(scores));
-  localStorage.setItem("yk_sort_idx", currentIdx);
-  localStorage.setItem("yk_sort_pairs", JSON.stringify(pairs));
-}
-
-function loadProgress() {
-  var savedScores = localStorage.getItem("yk_sort_scores");
-  var savedIdx = localStorage.getItem("yk_sort_idx");
-  var savedPairs = localStorage.getItem("yk_sort_pairs");
-
-  if (savedScores && savedIdx && savedPairs) {
-    scores = JSON.parse(savedScores);
-    currentIdx = parseInt(savedIdx, 10);
-    pairs = JSON.parse(savedPairs);
-  }
-}
-
-function resetProgress() {
-  if (confirm("진행 상황을 초기화하고 처음부터 시작하시겠습니까?")) {
-    localStorage.removeItem("yk_sort_scores");
-    localStorage.removeItem("yk_sort_idx");
-    localStorage.removeItem("yk_sort_pairs");
-    location.reload();
   }
 }
 
