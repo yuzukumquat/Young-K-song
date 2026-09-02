@@ -78,7 +78,7 @@ h2 { font-size: 20px; margin: 10px 0 5px; }
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 .result-table th, .result-table td {
-  padding: 12px;
+  padding: 12px 8px;
   border-bottom: 1px solid #eee;
   font-size: 14px;
   text-align: center;
@@ -93,6 +93,7 @@ h2 { font-size: 20px; margin: 10px 0 5px; }
 
 <div id="progressBar">진행률: 0%</div>
 
+<!-- 소트 진행 화면 -->
 <div id="sortContainer" class="card-container">
   <button id="leftBtn" class="song-btn" onclick="selectSong(0)">로딩 중...</button>
   <button id="rightBtn" class="song-btn" onclick="selectSong(1)">로딩 중...</button>
@@ -100,21 +101,29 @@ h2 { font-size: 20px; margin: 10px 0 5px; }
   <div class="sub-btn-group">
     <button class="sub-btn" onclick="selectSong(2)">둘 다 좋다</button>
     <button class="sub-btn" onclick="selectSong(2)">모르겠다</button>
-    <button class="sub-btn" onclick="undoSelect()" style="background-color:#fff3cd; border-color:#ffebaa;">이전으로</button>
+    <button class="sub-btn" onclick="undoSelect()" style="background-color:#fff3cd; border-color:#ffebaa;">↩️ 이전으로</button>
   </div>
+  
+  <!-- 3. 소트 중간 처음부터 다시하기 버튼 -->
+  <button class="sub-btn" onclick="resetProgress()" style="width:100%; margin-top:10px; background-color:#ffdcdc; border-color:#f5b8b8;">처음부터 다시하기</button>
 </div>
 
+<!-- 소트 완료 결과 화면 -->
 <div id="resultContainer">
   <h3>✨ 당신의 Young K 최애곡 순위 ✨</h3>
   <table class="result-table">
     <thead>
       <tr>
-        <th style="width:25%;">순위</th>
+        <th style="width:20%;">순위</th>
         <th>곡 제목</th>
+        <th style="width:25%;">점수</th> <!-- 1. 결과 표에 점수 항목 추가 -->
       </tr>
     </thead>
     <tbody id="resultBody"></tbody>
   </table>
+  
+  <!-- 2. 완료 후 처음부터 다시하기 버튼 -->
+  <button class="sub-btn" onclick="resetProgress()" style="width:100%; margin-top:15px; padding:14px; background-color:#FFCC00; border-color:#FFCC00; font-size:15px; font-weight:bold;">↺ 처음부터 다시하기</button>
 </div>
 
 <script>
@@ -171,10 +180,12 @@ pairs.sort(function() { return 0.5 - Math.random(); });
 
 var currentIdx = 0;
 var totalPairs = pairs.length;
-  loadProgress();
 
 // 이전 기록을 저장할 배열
 var historyList = [];
+
+// 저장된 데이터 불러오기
+loadProgress();
 
 function renderPair() {
   if (currentIdx >= totalPairs) {
@@ -191,12 +202,13 @@ function renderPair() {
 }
 
 function selectSong(choice) {
-  // 선택 전 현재 상태 저장 (이전으로 돌아가기 위해)
+  // 1. 이전으로 돌아가기 위한 상태 기록
   historyList.push({
     scores: Object.assign({}, scores),
     currentIdx: currentIdx
   });
 
+  // 2. 점수 계산
   var pair = pairs[currentIdx];
   if (choice === 0) {
     scores[pair[0]] += 1;
@@ -208,20 +220,24 @@ function selectSong(choice) {
   }
 
   currentIdx++;
+  
+  // 3. 진행 상태 자동 저장
   saveProgress();
+
   renderPair();
 }
 
 // 이전 선택 취소(뒤로 가기)
 function undoSelect() {
   if (historyList.length === 0) {
-    alert("처음 단계입니다.");
+    alert("처음 단계이거나 되돌릴 이전 기록이 없습니다.");
     return;
   }
 
   var lastState = historyList.pop();
   scores = lastState.scores;
   currentIdx = lastState.currentIdx;
+
   saveProgress();
   renderPair();
 }
@@ -239,12 +255,16 @@ function renderResult() {
   tbody.innerHTML = "";
 
   for (var i = 0; i < sortedSongs.length; i++) {
+    var songName = sortedSongs[i];
+    var songScore = scores[songName];
+    
     var tr = document.createElement("tr");
-    tr.innerHTML = "<td>" + (i + 1) + "</td><td>" + sortedSongs[i] + "</td>";
+    // 순위, 곡 제목, 점수 같이 출력
+    tr.innerHTML = "<td>" + (i + 1) + "</td><td>" + songName + "</td><td>" + songScore + "점</td>";
     tbody.appendChild(tr);
   }
 }
-  
+
 // 자동 저장 및 데이터 관리 함수
 function saveProgress() {
   localStorage.setItem("yk_sort_scores", JSON.stringify(scores));
