@@ -101,10 +101,10 @@ h2 { font-size: 20px; margin: 10px 0 5px; }
   <div class="sub-btn-group">
     <button class="sub-btn" onclick="selectSong(2)">둘 다 좋다</button>
     <button class="sub-btn" onclick="selectSong(2)">모르겠다</button>
-    <button class="sub-btn" onclick="undoSelect()" style="background-color:#fff3cd; border-color:#ffebaa;">↩️ 이전으로</button>
+    <button class="sub-btn" onclick="undoSelect()" style="background-color:#fff3cd; border-color:#ffebaa;">이전으로</button>
   </div>
   
-  <!-- 3. 소트 중간 처음부터 다시하기 버튼 -->
+  <!-- 중간 처음부터 다시하기 버튼 -->
   <button class="sub-btn" onclick="resetProgress()" style="width:100%; margin-top:10px; background-color:#ffdcdc; border-color:#f5b8b8;">처음부터 다시하기</button>
 </div>
 
@@ -116,14 +116,14 @@ h2 { font-size: 20px; margin: 10px 0 5px; }
       <tr>
         <th style="width:20%;">순위</th>
         <th>곡 제목</th>
-        <th style="width:25%;">점수</th> <!-- 1. 결과 표에 점수 항목 추가 -->
+        <th style="width:25%;">점수</th>
       </tr>
     </thead>
     <tbody id="resultBody"></tbody>
   </table>
   
-  <!-- 2. 완료 후 처음부터 다시하기 버튼 -->
-  <button class="sub-btn" onclick="resetProgress()" style="width:100%; margin-top:15px; padding:14px; background-color:#FFCC00; border-color:#FFCC00; font-size:15px; font-weight:bold;">↺ 처음부터 다시하기</button>
+  <!-- 완료 후 처음부터 다시하기 버튼 (색상 통일 적용) -->
+  <button class="sub-btn" onclick="resetProgress()" style="width:100%; margin-top:15px; padding:12px; background-color:#ffdcdc; border-color:#f5b8b8;">처음부터 다시하기</button>
 </div>
 
 <script>
@@ -259,7 +259,6 @@ function renderResult() {
     var songScore = scores[songName];
     
     var tr = document.createElement("tr");
-    // 순위, 곡 제목, 점수 같이 출력
     tr.innerHTML = "<td>" + (i + 1) + "</td><td>" + songName + "</td><td>" + songScore + "점</td>";
     tbody.appendChild(tr);
   }
