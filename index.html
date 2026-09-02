@@ -101,6 +101,7 @@ text-align: center;
 <button class="sub-btn" onclick="selectSong(2)">둘 다 좋다</button>
 <button class="sub-btn" onclick="selectSong(2)">모르겠다</button>
 </div>
+<button class="sub-btn" onclick="resetProgress()" style="width:100%; margin-top:10px; background-color:#ffdcdc; border-color:#f5b8b8;">처음부터 다시하기</button>
 </div>
 
 <div id="resultContainer">
@@ -170,6 +171,7 @@ pairs.sort(function() { return 0.5 - Math.random(); });
 
 var currentIdx = 0;
 var totalPairs = pairs.length;
+loadProgress();
 
 function renderPair() {
 if (currentIdx >= totalPairs) {
@@ -197,6 +199,7 @@ scores[pair[1]] += 0.5;
 }
 
 currentIdx++;
+saveProgress();
 renderPair();
 }
 
@@ -219,6 +222,32 @@ tbody.appendChild(tr);
 }
 }
 
+ function saveProgress() {
+  localStorage.setItem("yk_sort_scores", JSON.stringify(scores));
+  localStorage.setItem("yk_sort_idx", currentIdx);
+  localStorage.setItem("yk_sort_pairs", JSON.stringify(pairs));
+}
+
+function loadProgress() {
+  var savedScores = localStorage.getItem("yk_sort_scores");
+  var savedIdx = localStorage.getItem("yk_sort_idx");
+  var savedPairs = localStorage.getItem("yk_sort_pairs");
+
+  if (savedScores && savedIdx && savedPairs) {
+    scores = JSON.parse(savedScores);
+    currentIdx = parseInt(savedIdx, 10);
+    pairs = JSON.parse(savedPairs);
+  }
+}
+
+ function resetProgress() {
+  if (confirm("진행 상황을 처음부터 다시 시작하시겠습니까?")) {
+    localStorage.removeItem("yk_sort_scores");
+    localStorage.removeItem("yk_sort_idx");
+    localStorage.removeItem("yk_sort_pairs");
+    location.reload();
+  }
+}
 // 즉시 실행
 renderPair();
 </script>
