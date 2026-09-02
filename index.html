@@ -171,6 +171,7 @@ pairs.sort(function() { return 0.5 - Math.random(); });
 
 var currentIdx = 0;
 var totalPairs = pairs.length;
+  loadProgress();
 
 // 이전 기록을 저장할 배열
 var historyList = [];
@@ -207,6 +208,7 @@ function selectSong(choice) {
   }
 
   currentIdx++;
+  saveProgress();
   renderPair();
 }
 
@@ -220,7 +222,7 @@ function undoSelect() {
   var lastState = historyList.pop();
   scores = lastState.scores;
   currentIdx = lastState.currentIdx;
-
+  saveProgress();
   renderPair();
 }
 
@@ -240,6 +242,34 @@ function renderResult() {
     var tr = document.createElement("tr");
     tr.innerHTML = "<td>" + (i + 1) + "</td><td>" + sortedSongs[i] + "</td>";
     tbody.appendChild(tr);
+  }
+}
+  
+// 자동 저장 및 데이터 관리 함수
+function saveProgress() {
+  localStorage.setItem("yk_sort_scores", JSON.stringify(scores));
+  localStorage.setItem("yk_sort_idx", currentIdx);
+  localStorage.setItem("yk_sort_pairs", JSON.stringify(pairs));
+}
+
+function loadProgress() {
+  var savedScores = localStorage.getItem("yk_sort_scores");
+  var savedIdx = localStorage.getItem("yk_sort_idx");
+  var savedPairs = localStorage.getItem("yk_sort_pairs");
+
+  if (savedScores && savedIdx && savedPairs) {
+    scores = JSON.parse(savedScores);
+    currentIdx = parseInt(savedIdx, 10);
+    pairs = JSON.parse(savedPairs);
+  }
+}
+
+function resetProgress() {
+  if (confirm("진행 상황을 초기화하고 처음부터 시작하시겠습니까?")) {
+    localStorage.removeItem("yk_sort_scores");
+    localStorage.removeItem("yk_sort_idx");
+    localStorage.removeItem("yk_sort_pairs");
+    location.reload();
   }
 }
 
