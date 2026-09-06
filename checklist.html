@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Young K 솔로 곡 청취 체크리스트</title>
-<!-- 결과 이미지 저장을 위한 라이브러리 -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 * { box-sizing: border-box; }
@@ -28,7 +27,6 @@ h2 { font-size: 20px; margin: 10px 0 5px; }
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
-/* 상단 정보 & 스티키 진행률 바 */
 .progress-box {
   position: sticky;
   top: 10px;
@@ -60,7 +58,6 @@ h2 { font-size: 20px; margin: 10px 0 5px; }
   transition: width 0.3s ease;
 }
 
-/* 컨트롤 버튼 그룹 */
 .btn-group {
   display: flex;
   gap: 8px;
@@ -78,7 +75,6 @@ h2 { font-size: 20px; margin: 10px 0 5px; }
   cursor: pointer;
 }
 
-/* 체크리스트 곡 목록 */
 .song-list {
   display: flex;
   flex-direction: column;
@@ -114,7 +110,6 @@ h2 { font-size: 20px; margin: 10px 0 5px; }
   flex: 1;
 }
 
-/* 결과 표시 카드 */
 #resultArea {
   display: none;
   margin-top: 20px;
@@ -123,35 +118,16 @@ h2 { font-size: 20px; margin: 10px 0 5px; }
   background: #ffffff;
   border: 2px solid #FFCC00;
   border-radius: 12px;
-  padding: 20px 16px;
+  padding: 24px 16px;
   text-align: center;
-}
-.badge {
-  display: inline-block;
-  background-color: #FFCC00;
-  color: #000;
-  font-weight: bold;
-  font-size: 12px;
-  padding: 4px 10px;
-  border-radius: 12px;
-  margin-bottom: 8px;
 }
 .result-title {
   font-size: 18px;
   font-weight: bold;
-  margin: 5px 0 15px;
-}
-.result-info {
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  padding: 12px;
-  font-size: 14px;
-  line-height: 1.6;
-  text-align: left;
   margin-bottom: 15px;
 }
 .result-score {
-  font-size: 22px;
+  font-size: 24px;
   font-weight: bold;
   color: #111;
   margin: 10px 0;
@@ -167,10 +143,9 @@ h2 { font-size: 20px; margin: 10px 0 5px; }
 <body>
 
 <div class="main-card">
-  <h2>🦊 Young K 솔로 곡 청취 체크리스트 🦊</h2>
-  <div class="sub-title">Eternal & Letters with notes & YOUNGEST</div>
+  <h2>Young K 솔로 곡 청취 체크리스트</h2>
+  <div class="sub-title">Eternal / Letters with notes / YOUNGEST</div>
 
-  <!-- 진행 상황 박스 -->
   <div class="progress-box">
     <div class="progress-text" id="progressText">0 / 33곡 감상 완료 (0%)</div>
     <div class="progress-bar-bg">
@@ -178,26 +153,19 @@ h2 { font-size: 20px; margin: 10px 0 5px; }
     </div>
   </div>
 
-  <!-- 전체 선택 / 해제 버튼 -->
   <div class="btn-group">
     <button class="sub-btn" onclick="checkAll(true)">전체 선택</button>
     <button class="sub-btn" onclick="checkAll(false)">전체 해제</button>
   </div>
 
-  <!-- 곡 체크리스트 목록 -->
   <div class="song-list" id="songList"></div>
 
-  <!-- 결과 확인하기 버튼 -->
-  <button class="sub-btn" onclick="showResult()" style="width:100%; margin-top:15px; padding:14px; background-color:#FFCC00; border-color:#FFCC00; font-size:15px; font-weight:bold;">✨ 결과 확인하기 ✨</button>
+  <button class="sub-btn" onclick="showResult()" style="width:100%; margin-top:15px; padding:14px; background-color:#FFCC00; border-color:#FFCC00; font-size:15px; font-weight:bold;">결과 확인하기</button>
 
-  <!-- 결과 영역 -->
   <div id="resultArea">
     <div id="captureTarget" class="result-card">
-      <span class="badge">CONCERT CHECKLIST</span>
-    
-
+      <div class="result-title">Young K 솔로 곡 감상 결과</div>
       <div class="result-score" id="resultScoreText">0 / 33곡 (0%)</div>
-      <div id="resultRankText" style="font-size: 15px; font-weight: bold; color: #555;"></div>
     </div>
 
     <div class="action-btn-group">
@@ -209,11 +177,13 @@ h2 { font-size: 20px; margin: 10px 0 5px; }
 
 <script>
 var songs = [
-  "베스트 송", "끝까지 안아 줄게", "사랑은 얼어 죽을", "Microphone", "want to love you",
-  "그대로 와줘요", "잘 자라 내 사람아", "오늘만을 너만을 이날을", "이것밖에는 없다", "let it be summer",
-  "꿈꾼", "Bungee Jumping", "natural", "STRANGE", "SOUL", "playground", "babo", "what is..", "Marionette", "Shut The Door", "F world", "Hey Honey", "응원가",
+  "Marionette", "Shut The Door", "F world", "Hey Honey", "응원가",
   "SPIKE", "Yonge St.", "million reasons", "우리가 헤어질 100가지 이유", "Drivin' into Hell",
-  "whatever", "Goodbye, Love", "집으로 향한다", "안개꽃", "작업실에서 커피를"
+  "whatever", "작업실에서 커피를", "안개꽃", "Goodbye, Love", "집으로 향한다",
+  "오늘만을 너만을 이날을", "이것밖에는 없다", "꿈꾼", "natural", "STRANGE",
+  "Bungee Jumping", "SOUL", "babo", "what is..", "let it be summer",
+  "베스트 송", "끝까지 안아 줄게", "사랑은 얼어 죽을", "Microphone", "want to love you",
+  "그대로 와줘요", "잘 자라 내 사람아", "playground"
 ];
 
 function initList() {
@@ -268,12 +238,8 @@ function showResult() {
   var percent = Math.round((checkedCount / total) * 100);
 
   document.getElementById("resultScoreText").innerText = checkedCount + " / " + total + "곡 (" + percent + "%)";
-
-  
-  document.getElementById("resultRankText").innerText = rankMsg;
   document.getElementById("resultArea").style.display = "block";
 
-  // 결과 카드 위치로 스크롤 이동
   document.getElementById("resultArea").scrollIntoView({ behavior: 'smooth' });
 }
 
@@ -284,11 +250,11 @@ function copyResultText() {
   });
   var percent = Math.round((checkedCount / songs.length) * 100);
 
-  var text = "🦊 Young K 솔로 곡 감상 체크리스트 🦊\n" +
-             "총 " + songs.length + "곡 중 " + checkedCount + "곡 감상 완료 (" + percent + "%)\n" + document.getElementById("resultRankText").innerText;
+  var text = "Young K 솔로 곡 감상 체크리스트\n" +
+             "총 " + songs.length + "곡 중 " + checkedCount + "곡 감상 완료 (" + percent + "%)";
 
   navigator.clipboard.writeText(text).then(function() {
-    alert("결과가 클립보드에 복사되었습니다!");
+    alert("결과가 클립보드에 복사되었습니다.");
   });
 }
 
