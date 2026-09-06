@@ -192,7 +192,7 @@ h2 { font-size: 20px; margin: 10px 0 5px; }
     <button class="sub-btn" onclick="showResult()" style="width:100%; margin-top:15px; padding:14px; background-color:#FFCC00; border-color:#FFCC00; font-size:15px; font-weight:bold;">결과 확인하기</button>
   </div>
 
-  <!-- 결과 화면 (다음 페이지 역할) -->
+  <!-- 결과 화면 -->
   <div id="resultArea">
     <div id="captureTarget" class="result-card">
       <div class="result-title">Young K 솔로곡 라이브 체크리스트</div>
@@ -202,9 +202,8 @@ h2 { font-size: 20px; margin: 10px 0 5px; }
     </div>
 
     <div class="action-btn-group">
-      <button class="sub-btn" onclick="copyResultText()" style="background-color:#e3f2fd; border-color:#bbdefb; padding:12px;">결과 텍스트 복사</button>
       <button class="sub-btn" onclick="downloadResultImage()" style="background-color:#e8f5e9; border-color:#c8e6c9; padding:12px;">결과 이미지 저장</button>
-      <button class="sub-btn" onclick="backToCheck()" style="padding:12px; margin-top:5px;">다시 체크하기</button>
+      <button class="sub-btn" onclick="backToCheck()" style="padding:12px; margin-top:5px;">↩️ 다시 체크하기</button>
     </div>
   </div>
 </div>
@@ -330,32 +329,15 @@ function showResult() {
     gridContainer.appendChild(groupDiv);
   });
 
-  // 체크 화면 숨기고 결과 화면 보이기
   document.getElementById("checkArea").style.display = "none";
   document.getElementById("resultArea").style.display = "block";
   window.scrollTo(0, 0);
 }
 
 function backToCheck() {
-  // 결과 화면 숨기고 체크 화면 보이기
   document.getElementById("resultArea").style.display = "none";
   document.getElementById("checkArea").style.display = "block";
   window.scrollTo(0, 0);
-}
-
-function copyResultText() {
-  var checkedCount = 0;
-  document.querySelectorAll('#songList input[type="checkbox"]').forEach(function(cb) {
-    if (cb.checked) checkedCount++;
-  });
-  var percent = Math.round((checkedCount / allSongs.length) * 100);
-
-  var text = "Young K 솔로곡 라이브 체크리스트\n" +
-             "총 " + allSongs.length + "곡 중 " + checkedCount + "곡 감상 완료 (" + percent + "%)";
-
-  navigator.clipboard.writeText(text).then(function() {
-    alert("결과가 클립보드에 복사되었습니다.");
-  });
 }
 
 function downloadResultImage() {
