@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Young K 솔로 곡 청취 체크리스트</title>
+<title>Young K 솔로곡 라이브 체크리스트</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 * { box-sizing: border-box; }
@@ -19,7 +19,7 @@ h2 { font-size: 20px; margin: 10px 0 5px; }
 .sub-title { font-size: 13px; color: #666; margin-bottom: 15px; }
 
 .main-card {
-  max-width: 420px;
+  max-width: 480px;
   margin: 0 auto;
   background: #ffffff;
   border-radius: 12px;
@@ -114,24 +114,63 @@ h2 { font-size: 20px; margin: 10px 0 5px; }
   display: none;
   margin-top: 20px;
 }
+
 .result-card {
   background: #ffffff;
   border: 2px solid #FFCC00;
   border-radius: 12px;
-  padding: 24px 16px;
+  padding: 20px 14px;
   text-align: center;
 }
 .result-title {
   font-size: 18px;
   font-weight: bold;
-  margin-bottom: 15px;
+  margin-bottom: 5px;
 }
 .result-score {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: bold;
   color: #111;
-  margin: 10px 0;
+  margin-bottom: 15px;
 }
+
+.album-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: left;
+}
+.album-group {
+  background: #fafafa;
+  border-radius: 8px;
+  padding: 10px 12px;
+  border: 1px solid #eee;
+}
+.album-header {
+  font-size: 13px;
+  font-weight: bold;
+  color: #000;
+  border-bottom: 2px solid #FFCC00;
+  padding-bottom: 4px;
+  margin-bottom: 8px;
+}
+.album-song-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 8px;
+  font-size: 11px;
+}
+.song-check-item {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #aaa;
+}
+.song-check-item.checked {
+  color: #111;
+  font-weight: bold;
+}
+
 .action-btn-group {
   display: flex;
   flex-direction: column;
@@ -143,7 +182,7 @@ h2 { font-size: 20px; margin: 10px 0 5px; }
 <body>
 
 <div class="main-card">
-  <h2>Young K 솔로 곡 청취 체크리스트</h2>
+  <h2>Young K 솔로곡 라이브 체크리스트</h2>
   <div class="sub-title">Eternal / Letters with notes / YOUNGEST</div>
 
   <div class="progress-box">
@@ -164,8 +203,10 @@ h2 { font-size: 20px; margin: 10px 0 5px; }
 
   <div id="resultArea">
     <div id="captureTarget" class="result-card">
-      <div class="result-title">Young K 솔로 곡 감상 결과</div>
+      <div class="result-title">Young K 솔로 곡 감상 리포트</div>
       <div class="result-score" id="resultScoreText">0 / 33곡 (0%)</div>
+
+      <div class="album-grid" id="albumResultGrid"></div>
     </div>
 
     <div class="action-btn-group">
@@ -176,30 +217,56 @@ h2 { font-size: 20px; margin: 10px 0 5px; }
 </div>
 
 <script>
-var songs = [
-  "Marionette", "Shut The Door", "F world", "Hey Honey", "응원가",
-  "SPIKE", "Yonge St.", "million reasons", "우리가 헤어질 100가지 이유", "Drivin' into Hell",
-  "whatever", "작업실에서 커피를", "안개꽃", "Goodbye, Love", "집으로 향한다",
-  "오늘만을 너만을 이날을", "이것밖에는 없다", "꿈꾼", "natural", "STRANGE",
-  "Bungee Jumping", "SOUL", "babo", "what is..", "let it be summer",
-  "베스트 송", "끝까지 안아 줄게", "사랑은 얼어 죽을", "Microphone", "want to love you",
-  "그대로 와줘요", "잘 자라 내 사람아", "playground"
+// 앨범 순서 변경: Eternal -> Letters with notes -> YOUNGEST (괄호 제거)
+var albums = [
+  {
+    name: "Eternal",
+    songs: [
+      "베스트 송", "끝까지 안아 줄게", "사랑은 얼어 죽을", "Microphone", 
+      "want to love you", "그대로 와줘요", "잘 자라 내 사람아"
+    ]
+  },
+  {
+    name: "Letters with notes",
+    songs: [
+      "오늘만을 너만을 이날을", "이것밖에는 없다", "꿈꾼", "natural", "STRANGE",
+      "Bungee Jumping", "SOUL", "babo", "what is..", "let it be summer", "playground"
+    ]
+  },
+  {
+    name: "YOUNGEST",
+    songs: [
+      "Marionette", "Shut The Door", "F world", "Hey Honey", "응원가",
+      "SPIKE", "Yonge St.", "million reasons", "우리가 헤어질 100가지 이유", 
+      "Drivin' into Hell", "whatever", "작업실에서 커피를", "안개꽃", "Goodbye, Love", "집으로 향한다"
+    ]
+  }
 ];
+
+var allSongs = [];
+albums.forEach(function(album) {
+  allSongs = allSongs.concat(album.songs);
+});
 
 function initList() {
   var listContainer = document.getElementById("songList");
   listContainer.innerHTML = "";
 
-  for (var i = 0; i < songs.length; i++) {
-    var item = document.createElement("label");
-    item.className = "song-item";
-    
-    item.innerHTML = 
-      '<input type="checkbox" value="' + songs[i] + '" onchange="updateProgress()">' +
-      '<span class="song-title">' + (i + 1) + '. ' + songs[i] + '</span>';
-    
-    listContainer.appendChild(item);
-  }
+  var songIndex = 1;
+  albums.forEach(function(album) {
+    album.songs.forEach(function(songName) {
+      var item = document.createElement("label");
+      item.className = "song-item";
+      
+      item.innerHTML = 
+        '<input type="checkbox" data-song="' + songName + '" onchange="updateProgress()">' +
+        '<span class="song-title">' + songIndex + '. ' + songName + '</span>';
+      
+      listContainer.appendChild(item);
+      songIndex++;
+    });
+  });
+
   updateProgress();
 }
 
@@ -211,7 +278,7 @@ function updateProgress() {
     if (cb.checked) checkedCount++;
   });
 
-  var total = songs.length;
+  var total = allSongs.length;
   var percent = Math.round((checkedCount / total) * 100);
 
   document.getElementById("progressText").innerText = checkedCount + " / " + total + "곡 감상 완료 (" + percent + "%)";
@@ -227,19 +294,59 @@ function checkAll(status) {
 }
 
 function showResult() {
-  var checkboxes = document.querySelectorAll('#songList input[type="checkbox"]');
+  var checkedMap = {};
   var checkedCount = 0;
 
+  var checkboxes = document.querySelectorAll('#songList input[type="checkbox"]');
   checkboxes.forEach(function(cb) {
-    if (cb.checked) checkedCount++;
+    var songName = cb.getAttribute('data-song');
+    if (cb.checked) {
+      checkedMap[songName] = true;
+      checkedCount++;
+    } else {
+      checkedMap[songName] = false;
+    }
   });
 
-  var total = songs.length;
+  var total = allSongs.length;
   var percent = Math.round((checkedCount / total) * 100);
 
   document.getElementById("resultScoreText").innerText = checkedCount + " / " + total + "곡 (" + percent + "%)";
-  document.getElementById("resultArea").style.display = "block";
 
+  var gridContainer = document.getElementById("albumResultGrid");
+  gridContainer.innerHTML = "";
+
+  albums.forEach(function(album) {
+    var groupDiv = document.createElement("div");
+    groupDiv.className = "album-group";
+
+    var headerDiv = document.createElement("div");
+    headerDiv.className = "album-header";
+    headerDiv.innerText = album.name;
+    groupDiv.appendChild(headerDiv);
+
+    var songListDiv = document.createElement("div");
+    songListDiv.className = "album-song-list";
+
+    album.songs.forEach(function(songName) {
+      var songDiv = document.createElement("div");
+      var isChecked = checkedMap[songName];
+
+      if (isChecked) {
+        songDiv.className = "song-check-item checked";
+        songDiv.innerText = "[✓] " + songName;
+      } else {
+        songDiv.className = "song-check-item";
+        songDiv.innerText = "[  ] " + songName;
+      }
+      songListDiv.appendChild(songDiv);
+    });
+
+    groupDiv.appendChild(songListDiv);
+    gridContainer.appendChild(groupDiv);
+  });
+
+  document.getElementById("resultArea").style.display = "block";
   document.getElementById("resultArea").scrollIntoView({ behavior: 'smooth' });
 }
 
@@ -248,10 +355,10 @@ function copyResultText() {
   document.querySelectorAll('#songList input[type="checkbox"]').forEach(function(cb) {
     if (cb.checked) checkedCount++;
   });
-  var percent = Math.round((checkedCount / songs.length) * 100);
+  var percent = Math.round((checkedCount / allSongs.length) * 100);
 
-  var text = "Young K 솔로 곡 감상 체크리스트\n" +
-             "총 " + songs.length + "곡 중 " + checkedCount + "곡 감상 완료 (" + percent + "%)";
+  var text = "Young K 솔로곡 라이브 체크리스트\n" +
+             "총 " + allSongs.length + "곡 중 " + checkedCount + "곡 감상 완료 (" + percent + "%)";
 
   navigator.clipboard.writeText(text).then(function() {
     alert("결과가 클립보드에 복사되었습니다.");
