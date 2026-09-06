@@ -150,14 +150,19 @@ h2 { font-size: 20px; margin: 10px 0 5px; }
 .album-song-list {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 4px 8px;
+  gap: 6px 8px;
   font-size: 11px;
 }
+
+/* 글자 아래쪽 잘림 방지 스타일 */
 .song-check-item {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   color: #aaa;
+  line-height: 1.5;
+  padding-bottom: 2px;
+  display: block;
 }
 .song-check-item.checked {
   color: #111;
@@ -342,7 +347,11 @@ function backToCheck() {
 
 function downloadResultImage() {
   var target = document.getElementById("captureTarget");
-  html2canvas(target).then(function(canvas) {
+  html2canvas(target, {
+    scale: 2,
+    useCORS: true,
+    scrollY: -window.scrollY
+  }).then(function(canvas) {
     var link = document.createElement("a");
     link.download = "YoungK_Checklist_Result.png";
     link.href = canvas.toDataURL("image/png");
