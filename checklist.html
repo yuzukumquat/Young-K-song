@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Young K 솔로 곡 청취 체크리스트</title>
+<!-- 결과 이미지 저장을 위한 라이브러리 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  text-align: center;
+  background-color: #f4f6f8;
+  margin: 0;
+  padding: 16px;
+  color: #111;
+}
+h2 { font-size: 20px; margin: 10px 0 5px; }
+.sub-title { font-size: 13px; color: #666; margin-bottom: 15px; }
+
+.main-card {
+  max-width: 420px;
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+/* 상단 정보 & 스티키 진행률 바 */
+.progress-box {
+  position: sticky;
+  top: 10px;
+  z-index: 10;
+  background: #ffffff;
+  border: 2px solid #FFCC00;
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 15px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+.progress-text {
+  font-size: 15px;
+  font-weight: bold;
+  color: #111;
+}
+.progress-bar-bg {
+  background-color: #eee;
+  border-radius: 8px;
+  height: 10px;
+  width: 100%;
+  margin-top: 8px;
+  overflow: hidden;
+}
+.progress-bar-fill {
+  background-color: #FFCC00;
+  height: 100%;
+  width: 0%;
+  transition: width 0.3s ease;
+}
+
+/* 컨트롤 버튼 그룹 */
+.btn-group {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+.sub-btn {
+  flex: 1;
+  background-color: #eef1f5;
+  border: 1px solid #c0c5cd;
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #222;
+  cursor: pointer;
+}
+
+/* 체크리스트 곡 목록 */
+.song-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+.song-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.15s;
+}
+.song-item:active {
+  background-color: #fff9e6;
+}
+.song-item input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #FFCC00;
+  margin-right: 12px;
+  cursor: pointer;
+}
+.song-title {
+  font-size: 15px;
+  font-weight: 500;
+  flex: 1;
+}
+
+/* 결과 표시 카드 */
+#resultArea {
+  display: none;
+  margin-top: 20px;
+}
+.result-card {
+  background: #ffffff;
+  border: 2px solid #FFCC00;
+  border-radius: 12px;
+  padding: 20px 16px;
+  text-align: center;
+}
+.badge {
+  display: inline-block;
+  background-color: #FFCC00;
+  color: #000;
+  font-weight: bold;
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  margin-bottom: 8px;
+}
+.result-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 5px 0 15px;
+}
+.result-info {
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 14px;
+  line-height: 1.6;
+  text-align: left;
+  margin-bottom: 15px;
+}
+.result-score {
+  font-size: 22px;
+  font-weight: bold;
+  color: #111;
+  margin: 10px 0;
+}
+.action-btn-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 15px;
+}
+</style>
+</head>
+<body>
+
+<div class="main-card">
+  <h2>🦊 Young K 솔로 곡 청취 체크리스트 🦊</h2>
+  <div class="sub-title">Eternal / Letters with notes / YOUNGEST</div>
+
+  <!-- 진행 상황 박스 -->
+  <div class="progress-box">
+    <div class="progress-text" id="progressText">0 / 33곡 감상 완료 (0%)</div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progressBarFill"></div>
+    </div>
+  </div>
+
+  <!-- 전체 선택 / 해제 버튼 -->
+  <div class="btn-group">
+    <button class="sub-btn" onclick="checkAll(true)">전체 선택</button>
+    <button class="sub-btn" onclick="checkAll(false)">전체 해제</button>
+  </div>
+
+  <!-- 곡 체크리스트 목록 -->
+  <div class="song-list" id="songList"></div>
+
+  <!-- 결과 확인하기 버튼 -->
+  <button class="sub-btn" onclick="showResult()" style="width:100%; margin-top:15px; padding:14px; background-color:#FFCC00; border-color:#FFCC00; font-size:15px; font-weight:bold;">✨ 결과 확인하기 ✨</button>
+
+  <!-- 결과 영역 -->
+  <div id="resultArea">
+    <div id="captureTarget" class="result-card">
+      <span class="badge">CONCERT CHECKLIST</span>
+      <div class="result-title">Young K Solo Concert 감상 리포트</div>
+      
+      <div class="result-info">
+        🎤 <b>아티스트</b>: Young K (영케이)<br>
+        🎵 <b>대상 앨범</b>: Eternal, Letters with notes, YOUNGEST<br>
+        📌 <b>체크 기준</b>: 음원 / 라이브 / 콘서트 직접 감상
+      </div>
+
+      <div class="result-score" id="resultScoreText">0 / 33곡 (0%)</div>
+      <div id="resultRankText" style="font-size: 15px; font-weight: bold; color: #555;"></div>
+    </div>
+
+    <div class="action-btn-group">
+      <button class="sub-btn" onclick="copyResultText()" style="background-color:#e3f2fd; border-color:#bbdefb; padding:12px;">📋 결과 텍스트 복사</button>
+      <button class="sub-btn" onclick="downloadResultImage()" style="background-color:#e8f5e9; border-color:#c8e6c9; padding:12px;">📸 결과 이미지 저장</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var songs = [
+  "Marionette", "Shut The Door", "F world", "Hey Honey", "응원가",
+  "SPIKE", "Yonge St.", "million reasons", "우리가 헤어질 100가지 이유", "Drivin' into Hell",
+  "whatever", "작업실에서 커피를", "안개꽃", "Goodbye, Love", "집으로 향한다",
+  "오늘만을 너만을 이날을", "이것밖에는 없다", "꿈꾼", "natural", "STRANGE",
+  "Bungee Jumping", "SOUL", "babo", "what is..", "let it be summer",
+  "베스트 송", "끝까지 안아 줄게", "사랑은 얼어 죽을", "Microphone", "want to love you",
+  "그대로 와줘요", "잘 자라 내 사람아", "playground"
+];
+
+function initList() {
+  var listContainer = document.getElementById("songList");
+  listContainer.innerHTML = "";
+
+  for (var i = 0; i < songs.length; i++) {
+    var item = document.createElement("label");
+    item.className = "song-item";
+    
+    item.innerHTML = 
+      '<input type="checkbox" value="' + songs[i] + '" onchange="updateProgress()">' +
+      '<span class="song-title">' + (i + 1) + '. ' + songs[i] + '</span>';
+    
+    listContainer.appendChild(item);
+  }
+  updateProgress();
+}
+
+function updateProgress() {
+  var checkboxes = document.querySelectorAll('#songList input[type="checkbox"]');
+  var checkedCount = 0;
+
+  checkboxes.forEach(function(cb) {
+    if (cb.checked) checkedCount++;
+  });
+
+  var total = songs.length;
+  var percent = Math.round((checkedCount / total) * 100);
+
+  document.getElementById("progressText").innerText = checkedCount + " / " + total + "곡 감상 완료 (" + percent + "%)";
+  document.getElementById("progressBarFill").style.width = percent + "%";
+}
+
+function checkAll(status) {
+  var checkboxes = document.querySelectorAll('#songList input[type="checkbox"]');
+  checkboxes.forEach(function(cb) {
+    cb.checked = status;
+  });
+  updateProgress();
+}
+
+function showResult() {
+  var checkboxes = document.querySelectorAll('#songList input[type="checkbox"]');
+  var checkedCount = 0;
+
+  checkboxes.forEach(function(cb) {
+    if (cb.checked) checkedCount++;
+  });
+
+  var total = songs.length;
+  var percent = Math.round((checkedCount / total) * 100);
+
+  document.getElementById("resultScoreText").innerText = checkedCount + " / " + total + "곡 (" + percent + "%)";
+
+  // 감상 등급 칭호 설정
+  var rankMsg = "";
+  if (percent === 100) rankMsg = "🏆 영케이 솔로곡 완벽 마스터!";
+  else if (percent >= 80) rankMsg = "✨ 콘서트 셋리스트 정복자!";
+  else if (percent >= 50) rankMsg = "🎧 열혈 명곡 탐험가";
+  else if (percent >= 20) rankMsg = "🌱 영케이 솔로 입문자";
+  else rankMsg = "🎵 이제 입덕을 시작해 볼까요?";
+
+  document.getElementById("resultRankText").innerText = rankMsg;
+  document.getElementById("resultArea").style.display = "block";
+
+  // 결과 카드 위치로 스크롤 이동
+  document.getElementById("resultArea").scrollIntoView({ behavior: 'smooth' });
+}
+
+function copyResultText() {
+  var checkedCount = 0;
+  document.querySelectorAll('#songList input[type="checkbox"]').forEach(function(cb) {
+    if (cb.checked) checkedCount++;
+  });
+  var percent = Math.round((checkedCount / songs.length) * 100);
+
+  var text = "🦊 Young K 솔로 곡 감상 체크리스트 🦊\n" +
+             "총 " + songs.length + "곡 중 " + checkedCount + "곡 감상 완료 (" + percent + "%)\n" +
+             "달성 칭호: " + document.getElementById("resultRankText").innerText;
+
+  navigator.clipboard.writeText(text).then(function() {
+    alert("결과가 클립보드에 복사되었습니다!");
+  });
+}
+
+function downloadResultImage() {
+  var target = document.getElementById("captureTarget");
+  html2canvas(target).then(function(canvas) {
+    var link = document.createElement("a");
+    link.download = "YoungK_Checklist_Result.png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  });
+}
+
+initList();
+</script>
+</body>
+</html>
